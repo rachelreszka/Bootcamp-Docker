@@ -1,0 +1,74 @@
+version: '3.1'
+
+services:
+
+  mongo:
+    image: mongo
+    container_name: db_noticias
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: dba
+      MONGO_INITDB_ROOT_PASSWORD: qwe123
+    volumes:
+      - /mongodb/data/db:/data/db
+    networks:
+      - network_docker
+
+ #mongo-express:
+ #  image: mongo-express
+ #  restart: always
+ #  ports:
+ #    - 8081:8081
+ #  environment:
+ #    ME_CONFIG_MONGODB_ADMINUSERNAME: dba
+ #    ME_CONFIG_MONGODB_ADMINPASSWORD: qwe123
+ #    ME_CONFIG_MONGODB_URL: mongodb://dba:qwe123@mongo:27017/
+  
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+        - 5672:5672
+        - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: dba
+      RABBITMQ_DEFAULT_PASS: qwe123
+    healthcheck:
+      test: "exit 0"
+    volumes:
+        - ~/.docker-conf/rabbitmq/:/var/lib/rabbitmq/mnesia/
+    networks: 
+      #   - rabbitmq_go_net
+      - network_docker
+    #command: ["bash", "-c", "chmod 400 /var/lib/rabbitmq/.erlang.cookie; rabbitmq-server"]
+
+  googlenewsapi:
+    image: api_noticias:1.0
+    container_name: googlenewsapi
+    depends_on:
+        rabbitmq:
+          condition: service_healthy
+    networks: 
+        - network_docker
+    # volumes:
+    #  - /api_googlenews/:/api_googlenews/
+
+
+  worker:
+    image: worker:1.0
+    container_name: worker
+    depends_on:
+        rabbitmq:
+          condition: service_healthy
+    networks: 
+        - network_docker
+
+
+networks:
+  #rabbitmq_go_net:
+    #driver: bridge
+  network_docker:
+    driver: bridge
+

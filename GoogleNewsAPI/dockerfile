@@ -1,0 +1,8 @@
+
+# syntax=docker/dockerfile:1
+FROM python
+RUN pip install googlenews
+RUN pip install pika
+COPY ./*.py /tmp/
+CMD python /tmp/googlenews.py; python /tmp/send.py
+#CMD python /tmp/send.py

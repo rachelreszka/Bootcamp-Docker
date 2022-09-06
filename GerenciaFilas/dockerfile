@@ -1,0 +1,7 @@
+
+# syntax=docker/dockerfile:1
+FROM python
+RUN pip install pymongo
+RUN pip install pika
+COPY ./worker.py /tmp/
+CMD python /tmp/worker.py

@@ -1,0 +1,9 @@
+FROM python
+RUN pip install fastapi==0.79.0
+RUN pip install beanie==1.7.2
+RUN pip install motor==2.5.1
+RUN pip install typing-extensions==4.1.1
+RUN pip install pydantic==1.9.1
+RUN pip install uvicorn==0.16.0
+COPY / /tmp/
+CMD python /tmp/main.py
